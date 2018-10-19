@@ -44,11 +44,25 @@ POROUS_FLOW         := no
 include $(MOOSE_DIR)/modules/modules.mk
 ###############################################################################
 
+# Use the CRANE submodule if it exists and CRANE_DIR is not set
+CRANE_SUBMODULE := $(CURDIR)/crane
+ifneq ($(wildcard $(CRANE_SUBMODULE)/Makefile),)
+  CRANE_DIR        ?= $(CRANE_SUBMODULE)
+else
+  CRANE_DIR        ?= $(shell dirname `pwd`)/crane
+endif
+
+# crane
+APPLICATION_DIR    := $(CRANE_DIR)
+APPLICATION_NAME   := crane
+include            $(FRAMEWORK_DIR)/app.mk
+
 # dep apps
 APPLICATION_DIR    := $(CURDIR)
 APPLICATION_NAME   := wolf
 BUILD_EXEC         := yes
-GEN_REVISION       := no
+#GEN_REVISION       := no
+DEP_APPS           := $(shell $(FRAMEWORK_DIR)/scripts/find_dep_apps.py $(APPLICATION_NAME))
 include            $(FRAMEWORK_DIR)/app.mk
 
 ###############################################################################

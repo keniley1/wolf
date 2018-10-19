@@ -3,27 +3,36 @@
 #include "AppFactory.h"
 #include "ModulesApp.h"
 #include "MooseSyntax.h"
+#include "CraneApp.h"
 
 template <>
 InputParameters
 validParams<WolfApp>()
 {
   InputParameters params = validParams<MooseApp>();
+  params.set<bool>("use_legacy_output_syntax") = false;
+  params.set<bool>("use_legacy_uo_initialization") = false;
+  params.set<bool>("use_legacy_uo_aux_computation") = false;
   return params;
 }
+
+registerKnownLabel("WolfApp");
 
 WolfApp::WolfApp(InputParameters parameters) : MooseApp(parameters)
 {
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);
+  CraneApp::registerObjects(_factory);
   WolfApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
   ModulesApp::associateSyntax(_syntax, _action_factory);
+  CraneApp::associateSyntax(_syntax, _action_factory);
   WolfApp::associateSyntax(_syntax, _action_factory);
 
   Moose::registerExecFlags(_factory);
   ModulesApp::registerExecFlags(_factory);
+  CraneApp::registerExecFlags(_factory);
   WolfApp::registerExecFlags(_factory);
 }
 
@@ -42,7 +51,7 @@ WolfApp::registerObjects(Factory & factory)
 }
 
 void
-WolfApp::associateSyntax(Syntax & /*syntax*/, ActionFactory & action_factory)
+WolfApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
   Registry::registerActionsTo(action_factory, {"WolfApp"});
 

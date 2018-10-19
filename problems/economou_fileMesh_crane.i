@@ -21,6 +21,11 @@
     f_name = kex
     function = '5e-15 * ((2 / 3) * mean_en)^0.74 * exp(-11.56 * 3 / (2 * mean_en))'
   [../]
+  [./gas_density]
+    type = GenericConstantMaterial
+    prop_names = 'n_gas'
+    prop_values = '3.22e16'
+  [../]
 []
 
 [Variables]
@@ -85,12 +90,12 @@
     mobility = 3e5
     sign = -1.0
   [../]
-  [./ne_gnd_state_ioniz]
-    type = GndStateIonizationElectrons
-    variable = ne
-    second_species = 3.22e16 # background gas density (cm^-3)
-    mean_energy = mean_en
-  [../]
+  # [./ne_gnd_state_ioniz]
+  #   type = GndStateIonizationElectrons
+  #   variable = ne
+  #   second_species = 3.22e16 # background gas density (cm^-3)
+  #   mean_energy = mean_en
+  # [../]
   [./ion_time_derivative]
     type = TimeDerivative
     variable = ni
@@ -107,13 +112,13 @@
     mobility = 1.444e3
     sign = 1.0
   [../]
-  [./ni_gnd_state_ioniz]
-    type = GndStateIonizationIons
-    variable = ni
-    electrons = ne
-    second_species = 3.22e16 # background gas density (cm^-3)
-    mean_energy = mean_en
-  [../]
+  # [./ni_gnd_state_ioniz]
+  #   type = GndStateIonizationIons
+  #   variable = ni
+  #   electrons = ne
+  #   second_species = 3.22e16 # background gas density (cm^-3)
+  #   mean_energy = mean_en
+  # [../]
   [./energy_time_derivative]
     type = EnergyTimeDerivative
     variable = mean_en
@@ -151,18 +156,18 @@
     diffusivity = 1.988e6
     mobility = 3e5
   [../]
-  [./energy_gnd_state_excitation]
-    type = EnergyExcitation
-    variable = mean_en
-    electrons = ne
-    background_gas_density = 3.22e16
-  [../]
-  [./energy_gnd_state_ionization]
-    type = EnergyIonization
-    variable = mean_en
-    electrons = ne
-    background_gas_density = 3.22e16
-  [../]
+  # [./energy_gnd_state_excitation]
+  #   type = EnergyExcitation
+  #   variable = mean_en
+  #   electrons = ne
+  #   background_gas_density = 3.22e16
+  # [../]
+  # [./energy_gnd_state_ionization]
+  #   type = EnergyIonization
+  #   variable = mean_en
+  #   electrons = ne
+  #   background_gas_density = 3.22e16
+  # [../]
 []
 
 [BCs]
@@ -300,10 +305,20 @@
   [../]
 []
 
+[ChemicalReactions]
+  [./Network]
+    species = 'ne ni'
+    equation_variables = 'mean_en'
+    reaction_coefficient_format = 'rate'
+
+    reactions = 'ne + N -> ne + ne + ni  : {2.34e-14 * ((2 / 3) * mean_en)^0.59 * exp(-17.44 * 3 / (2 * mean_en))} [-10]'
+  [../]
+[]
+
 [Executioner]
   type = Transient
   solve_type = PJFNK
-  # num_steps = 100
+  # num_steps = 1000
   # num_steps = 1e6    # 10 is one rf cycle if dt is 7.374631e-9 and f = 13.56 MHz
                       # Economou mentions 1e5 rf cycles needed for convergence without acceleration
   #dt = 7.374631e-9
